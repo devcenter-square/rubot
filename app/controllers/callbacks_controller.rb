@@ -4,8 +4,9 @@ class CallbacksController < Devise::OmniauthCallbacksController
     if @admin.email != ""
       sign_in_and_redirect @admin
     else
+      # this will probable never get thrown now. todo: limit sign-in to DC admins?
       puts "Auth ERROR!!!"
-      redirect_to new_admin_session_path, flash: {error: 'You must log in with your Udacity or Knowlabs email address.' } 
+      redirect_to new_admin_session_path, flash: {error: 'You probably are not an admin of the DC community... :stuck_out_tongue:' }
     end
   end
 end

@@ -49,7 +49,6 @@ gem 'net-telnet'
 gem 'power_assert'
 gem 'psych'
 gem 'rake'
-gem 'rdoc'
 gem 'test-unit'
 gem 'tzinfo-data'
 
@@ -73,5 +72,8 @@ group :development do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+
+  # Pry to pry... go figure
+  gem 'pry-rails'
 end
 
