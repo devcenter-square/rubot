@@ -23,18 +23,3 @@ test:
   override:
     - make test
 
-deployment:
-  rubot:
-    branch: "rubot"
-    commands:
-      - ./deploy.rb
-
-  swiftbot:
-    branch: "swiftbot"
-    commands:
-      - ./deploy.rb
-
-  introbot:
-    branch: "introbot"
-    commands:
-      - ./deploy.rb
