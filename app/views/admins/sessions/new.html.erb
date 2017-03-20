@@ -12,7 +12,6 @@
         <p><%= link_to 'Log Out', destroy_admin_session_path, :method => :delete %> </p>
         <% else %>
         <div class="header">
-          <p>Please sign in with your Udacity email.</p>
           <button class="ui labeled left floated red icon button">
             <i class="google icon"></i>
             <%= link_to "Sign in with Google", admin_omniauth_authorize_path(:google_oauth2) %>

@@ -28,7 +28,7 @@ module Rubot
     config.after_initialize do
       puts "ENV = development? #{Rails.env.development?}"
       
-      Rails.application.config.client_name = "introbot"
+      Rails.application.config.client_name = "rubolympics"
       Rails.application.config.ndkey = "nd000"
       Rails.application.config.standard_responses = 
         [
