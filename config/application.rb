@@ -25,6 +25,9 @@ module Rubot
 
     config.autoload_paths += %W(#{config.root}/lib)
 
+    # Environmental configurations
+    config.ga_tracking_id = ENV['GA_TRACKING_ID']
+
     config.after_initialize do
       puts "ENV = development? #{Rails.env.development?}"
       
@@ -39,6 +42,7 @@ module Rubot
           "Ahhh, to be fluent in English! Type `help` to see the limited English that I understand."
         ]
 
+      # TODO: So this is what's fucking our application up... will need to re-write this
       Thread.new do
         @client = Client.new
         Rails.application.config.client = @client.setup_client

@@ -55,7 +55,7 @@ module ClientUser
           channel_id: client.web_client.im_open(user: data.user.id).channel.id
         )
         @user.save
-        identify(@user)
+        # identify(@user)
       end
     end
   end
@@ -70,7 +70,7 @@ module ClientUser
       @user.email =     data.user.profile.email
       @user.pic =       data.user.profile.image_192
       @user.save
-      identify(@user)
+      # identify(@user)
     end
   end
 

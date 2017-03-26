@@ -1,7 +1,22 @@
 class Client < ActiveRecord::Base
+  include HTTParty
   require 'pp'
-  include SegmentAnalytics
+  include GoogleAnalytics
   include ClientUser
+
+  base_uri 'google-analytics.com'
+
+
+
+  # Methods to implement on any included analytics to be used:
+  # :track_message(data)
+  # :track_scheduled_message(user, message_id, message_text)
+  # :track_rescheduled_message(log, message_id, message_text)
+  # :track_interactions(data, id, trigger, response)
+
+  def method_missing(method)
+    puts "WARN: #{method} was called, but it was not implemented anywhere on the Client's class."
+  end
 
   def setup_client
     puts "setup rubot!"
@@ -170,13 +185,43 @@ class Client < ActiveRecord::Base
     end
   end
 
-  #Set channel names for "track_message" method in segment_analytics.rb
+  ######################################################################################################################
+  # STUFFS WE WANT TRACKED
+  ######################################################################################################################
+
+  def word_count(text)
+    return '0' unless text.is_a? String
+    text.split.count
+  end
+
+  def emoji_count(text)
+    return '0' unless text.is_a? String
+    text.scan(/:[a-z_0-9]*:/m).count
+  end
+
+  def excla_count(text)
+    return '0' unless text.is_a? String
+    text.count('!')
+  end
+
+  def elipse_count(text)
+    return '0' unless text.is_a? String
+    text.scan(/\.\.\./m).count
+  end
+
+  def question_mark(text)
+    return '0' unless text.is_a? String
+    text.count('?')
+  end
+
+  ######################################################################################################################
+
   def channel_id_to_name(data)
     channel = nil
     if @@channel_list
       channel = @@channel_list.select {|channel| channel.id == data.channel}.first
     end
-    channel_name = channel != nil ? channel.name : "nil"
+    channel != nil ? channel.name : "nil"
   end
 
   def initialize_bot(client)
