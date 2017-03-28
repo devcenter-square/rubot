@@ -41,7 +41,14 @@ module Rubot
           "That sounds interesting, but my bot brain has no idea what it means! Type `help` to see what I can respond to.",
           "Ahhh, to be fluent in English! Type `help` to see the limited English that I understand."
         ]
-      Rails.application.config.client = @@client
+
+      # TODO: So this is what's fucking our application up... will need to re-write this
+      Thread.new do
+        @client = Client.new
+        Rails.application.config.client = @client.setup_client
+        @client.initialize_bot(Rails.application.config.client)
+        puts "CLIENT DOWN"
+      end
     end
     
   end
