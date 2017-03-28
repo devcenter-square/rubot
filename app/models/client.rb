@@ -13,6 +13,7 @@ class Client < ActiveRecord::Base
   # :track_scheduled_message(user, message_id, message_text)
   # :track_rescheduled_message(log, message_id, message_text)
   # :track_interactions(data, id, trigger, response)
+  # :identify(user)
 
   def method_missing(method)
     puts "WARN: #{method} was called, but it was not implemented anywhere on the Client's class."

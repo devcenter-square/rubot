@@ -47,14 +47,11 @@ module GoogleAnalytics
   end
 
   def identify(user)
-
+    # We ain't doing nothing here yet
   end
 
   def track(ga_data)
-    response = self.class.post('/collect', { query: ga_data })
-
-    puts "*"*21
-    puts "response: #{response}"
+    self.class.post('/collect', { query: ga_data })
   end
 
 end
