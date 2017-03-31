@@ -42,13 +42,15 @@ module Rubot
           "Ahhh, to be fluent in English! Type `help` to see the limited English that I understand."
         ]
 
-      # TODO: So this is what's fucking our application up... will need to re-write this
-      Thread.new do
-        @client = Client.new
-        Rails.application.config.client = @client.setup_client
-        @client.initialize_bot(Rails.application.config.client)
-        puts "CLIENT DOWN"
-      end
+      @client = Client.new
+      Rails.application.config.client = @client.setup_client
+      @client.initialize_bot(Rails.application.config.client)
+
+      # # TODO: So this is what's fucking our application up... will need to re-write this
+      # Thread.new do
+      #
+      #   puts "CLIENT DOWN"
+      # end
     end
     
   end
