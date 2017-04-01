@@ -42,38 +42,6 @@ module ClientUser
     end
   end
 
-  def add_new_user(client)
-    client.on :team_join do |data|
-      get_users
-      unless @users.any? { |person| person.slack_id == data.user.id }
-        @user = User.new(
-          user_name:  data.user.name,
-          real_name:  data.user.profile.real_name,
-          slack_id:   data.user.id,
-          email:      data.user.profile.email,
-          pic:        data.user.profile.image_192,
-          channel_id: client.web_client.im_open(user: data.user.id).channel.id
-        )
-        @user.save
-        # identify(@user)
-      end
-    end
-  end
-
-  def update_user(client)
-    client.on :user_change do |data|
-      puts "A user changed! (And I'm still running. Yay!)"
-      set_user(data)
-      @user.user_name = data.user.name
-      @user.real_name = data.user.profile.real_name
-      @user.slack_id =  data.user.id
-      @user.email =     data.user.profile.email
-      @user.pic =       data.user.profile.image_192
-      @user.save
-      # identify(@user)
-    end
-  end
-
   def set_user(data)
     #will work with responses from :team_join and :user_change events
     get_users

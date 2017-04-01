@@ -1,66 +1,109 @@
 class Client < ActiveRecord::Base
+
   include HTTParty
-  require 'pp'
   include GoogleAnalytics
   include ClientUser
 
   base_uri 'google-analytics.com'
 
+  require 'pp'
 
+  def initiate
 
-  # Methods to implement on any included analytics to be used:
-  # :track_message(data)
-  # :track_scheduled_message(user, message_id, message_text)
-  # :track_rescheduled_message(log, message_id, message_text)
-  # :track_interactions(data, id, trigger, response)
-  # :identify(user)
+    client = Slack::RealTime::Client.new
 
-  def method_missing(method)
-    puts "WARN: #{method} was called, but it was not implemented anywhere on the Client's class."
-  end
-
-  def setup_client
-    puts "setup rubot!"
-    @rubot = Slack::RealTime::Client.new(websocket_ping: 40)
-    # Override the CA_FILE and CA_PATH in the embedded web client if they are set in the environment
-    if ENV['CA_FILE'] and ENV['CA_PATH']    
-        web_client = Slack::Web::Client.new(ca_file: ENV['CA_FILE'], ca_path: ENV['CA_PATH'], websocket_ping: 40)
-        @rubot.web_client = web_client
-    end
-    @rubot
-  end
-
-  def say_hello_on_start(client)
-    client.on :hello do 
-      puts "Successfully connected, welcome '#{client.self.name}' to the '#{client.team.name}' team at https://#{client.team.domain}.slack.com."
-    end
-  end
-
-  def get_bot_user_id(client)
     client.on :hello do
-      get_users
-      puts "Bot name: #{client.self.name}"
-      bot = @users.select { |bot| bot.user_name == client.self.name }.first
-      #Set global to be used for health check and "respond_to_messages"
-      Rails.application.config.bot_id = bot.slack_id
-      puts "Bot ID: #{Rails.application.config.bot_id}"
+      puts "Successfully connected, welcome '#{client.self.name}' to the '#{client.team.name}' team at https://#{client.team.domain}.slack.com."
+      get_bot_user(client)
     end
-  end
 
-  def track_messages(client)
     client.on :message do |data|
       track_message(data)
+      respond_to_message(data: data, client: client)
+    end
+
+    client.on :team_join do |data|
+      send_scheduled_message(client: client, data: data)
+      add_new_user(client)
+    end
+
+    client.on :user_change do |data|
+      update_user(data)
+    end
+
+    client.on :close do |_data|
+      puts 'Connection closing, exiting.'
+
+      # SlackClient.initiate
+    end
+
+    client.on :closed do |_data|
+      puts 'Connection has been disconnected.'
+    end
+
+    # Other setups we need
+    set_channel_info(client)
+    set_channel_id(client)
+    reschedule_messages(client)
+    update_user_list(client) #todo: maybe put this in a rake file
+
+    client.start_async
+  end
+
+  def channel_id_to_name(data)
+    channel = nil
+    if @@channel_list
+      channel = @@channel_list.select {|channel| channel.id == data.channel}.first
+    end
+    channel != nil ? channel.name : "nil"
+  end
+
+  private
+  def add_new_user(client)
+    get_users
+    unless @users.any? { |person| person.slack_id == data.user.id }
+      @user = User.new(
+        user_name:  data.user.name,
+        real_name:  data.user.profile.real_name,
+        slack_id:   data.user.id,
+        email:      data.user.profile.email,
+        pic:        data.user.profile.image_192,
+        channel_id: client.web_client.im_open(user: data.user.id).channel.id
+      )
+      @user.save
+      # identify(@user)
     end
   end
 
-  def send_message(channel_id, text, client)
+  def update_user(data)
+    puts "A user changed! (And I'm still running. Yay!)"
+    set_user(data)
+    @user.user_name = data.user.name
+    @user.real_name = data.user.profile.real_name
+    @user.slack_id =  data.user.id
+    @user.email =     data.user.profile.email
+    @user.pic =       data.user.profile.image_192
+    @user.save
+    # identify(@user)
+  end
+
+  def get_bot_user(client)
+    get_users
+    puts "Bot name: #{client.self.name}"
+    bot = @users.select { |bot| bot.user_name == client.self.name }.first
+    #Set global to be used for health check and "respond_to_messages"
+    Rails.application.config.bot_id = bot.slack_id
+    puts "Bot ID: #{Rails.application.config.bot_id}"
+  end
+
+  def send_message(channel, text, client)
     client.web_client.chat_postMessage(
-      channel: channel_id, 
+      channel: channel,
       text: text,
       as_user: true,
       unfurl_links: false,
       unfurl_media: false
-      )
+    )
   end
 
   def create_log(user, message)
@@ -74,104 +117,56 @@ class Client < ActiveRecord::Base
     @log.save
   end
 
-  def send_scheduled_messages(client)
-    client.on :team_join do |data|
-      sleep(2)
-      set_user(data)
-      @messages = Message.all.sort
-      @messages.each do |message|
-        create_log(@user, message)
-        s = Rufus::Scheduler.new(:max_work_threads => 200)
-        s.in message.delay do
-          ActiveRecord::Base.connection_pool.with_connection do 
-            send_message(@user.channel_id, message.text, client)
-            track_scheduled_message(@user, message.id, message.text)
-            message.reach += 1
-            message.save
-            Log.where(message_id: message.id).first.delete
-          end
+  def send_scheduled_messages(client:, data:)
+    sleep(2)
+    set_user(data)
+    @messages = Message.all.sort
+    @messages.each do |message|
+      create_log(@user, message)
+      s = Rufus::Scheduler.new(:max_work_threads => 200)
+      s.in message.delay do
+        ActiveRecord::Base.connection_pool.with_connection do
+          send_message(@user.channel_id, message.text, client)
+          track_scheduled_message(@user, message.id, message.text)
+          message.reach += 1
+          message.save
+          Log.where(message_id: message.id).first.delete
         end
       end
     end
   end
 
-  def reschedule_messages(client)
-    Log.all.each do |log|
-      if log.delivery_time > Time.now
-        s = Rufus::Scheduler.new(:max_work_threads => 200)
-        s.at log.delivery_time do
-          ActiveRecord::Base.connection_pool.with_connection do
-            message = Message.find(log.message_id) 
-            send_message(log.channel_id, message.text, client)
-            track_rescheduled_message(log, log.message_id, message.text)
-            message.reach += 1
-            message.save
-            log.delete
-          end
-        end
+  def respond_to_message(data:, client:)
+    return if data.user == Rails.application.config.bot_id
+    channel = data.channel
+
+    if channel[0] == "D" && data.text
+      if interaction = Interaction.where(user_input: data.text.downcase).first
+        text = interaction.response
+        track_interactions(data, interaction.id, interaction.user_input, text)
+        interaction.hits += 1
+        interaction.save
+      else
+        text = get_response_for_data(data)
+        track_interactions(data, 0, "no trigger", "standard_response")
       end
+
+      send_message(channel, text, client)
     end
   end
 
-  def respond_to_messages(client)
-    client.on :message do |data|
-      #make sure bot only responds to other users and only in DM channels
-      if data.user != Rails.application.config.bot_id && data.channel[0] == "D" && data.text
-        if interaction = Interaction.where(user_input: data.text.downcase).first
-          send_message(data.channel, interaction.response, client)
-          track_interactions(data, interaction.id, interaction.user_input, interaction.response)
-          interaction.hits += 1
-          interaction.save
-        else
-          #if no matching interaction, send from a standard response set in "application.rb"
-          send_message(data.channel, Rails.application.config.standard_responses.sample, client)
-          track_interactions(data, 0, "no trigger", "standard_response")
-        end
-      end
+  def get_response_for_data(data)
+    case data.text
+      when 'bot hi' then
+        "Hi <@#{data.user}>!"
+      when /^bot/ then
+        "Sorry <@#{data.user}>, what?"
+      else
+        Rails.application.config.standard_responses.sample
     end
   end
 
-  def start_rubot(client)
-    puts "START RUBOT!!!"
-    client.start!
-  end
-
-  def kill_client_for_testing(client)
-    s = Rufus::Scheduler.new
-    s.in '15s' do
-      # puts "Client before #{client.web_client.channels_list.channels}"
-      puts "killing connection"
-      client.stop!
-      # sleep(15)
-      # puts "Client after #{client.web_client.channels_list.channels}"
-    end
-  end
-
-  def restart_client_if_connection_lost(client)
-    # kill_client_for_testing(client)
-    client.on :close do |data|
-      puts 'Connection has been disconnected. Restarting.'
-      Rails.application.config.client = setup_client
-      restart_bot(Rails.application.config.client)
-    end
-  end
-
-  # This method is just for fun.
-  def argue_with_slackbot(client)
-    client.on :message do |data|
-      if data.user == "USLACKBOT"
-        client.web_client.chat_postMessage(
-          channel: data.channel, 
-          text: "slackbot... what a dweeb.", 
-          as_user: true,
-          unfurl_links: false,
-          unfurl_media: false
-        )
-      end
-    end
-  end
-
-  #Grabs the channel data from slack's api 
+  #Grabs the channel data from slack's api
   #to be used by "channel_id_to_name" method
   def set_channel_info(client)
     @@channel_list = nil
@@ -186,9 +181,27 @@ class Client < ActiveRecord::Base
     end
   end
 
-  ######################################################################################################################
-  # STUFFS WE WANT TRACKED
-  ######################################################################################################################
+  def reschedule_messages(client)
+    Log.all.each do |log|
+      if log.delivery_time > Time.now
+        s = Rufus::Scheduler.new(:max_work_threads => 200)
+        s.at log.delivery_time do
+          ActiveRecord::Base.connection_pool.with_connection do
+            message = Message.find(log.message_id)
+            send_message(log.channel_id, message.text, client)
+            track_rescheduled_message(log, log.message_id, message.text)
+            message.reach += 1
+            message.save
+            log.delete
+          end
+        end
+      end
+    end
+  end
+
+  # ######################################################################################################################
+  # # STUFFS WE WANT TRACKED
+  # ######################################################################################################################
 
   def word_count(text)
     return '0' unless text.is_a? String
@@ -215,41 +228,6 @@ class Client < ActiveRecord::Base
     text.count('?')
   end
 
-  ######################################################################################################################
-
-  def channel_id_to_name(data)
-    channel = nil
-    if @@channel_list
-      channel = @@channel_list.select {|channel| channel.id == data.channel}.first
-    end
-    channel != nil ? channel.name : "nil"
-  end
-
-  def initialize_bot(client)
-    say_hello_on_start(client)
-    set_channel_info(client)
-    track_messages(client)
-    update_user_list(client)
-    set_channel_id(client)
-    get_bot_user_id(client)
-    add_new_user(client)
-    reschedule_messages(client)
-    send_scheduled_messages(client)
-    update_user(client)
-    respond_to_messages(client)
-    restart_client_if_connection_lost(client)
-    start_rubot(client)
-  end
-
-  def restart_bot(client)
-    say_hello_on_start(client)
-    track_messages(client)
-    add_new_user(client)
-    send_scheduled_messages(client)
-    update_user(client)
-    respond_to_messages(client)
-    restart_client_if_connection_lost(client)
-    start_rubot(client)
-  end
+  # ######################################################################################################################
 
 end
