@@ -33,8 +33,7 @@ class Client < ActiveRecord::Base
 
     client.on :close do |_data|
       puts 'Connection closing, exiting.'
-
-      # SlackClient.initiate
+      # initiate_another_client
     end
 
     client.on :closed do |_data|
@@ -197,6 +196,10 @@ class Client < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def initiate_another_client
+    Client.new.initiate
   end
 
   # ######################################################################################################################
