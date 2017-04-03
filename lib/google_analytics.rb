@@ -51,8 +51,7 @@ module GoogleAnalytics
   end
 
   def track(ga_data)
-    res = self.class.post('/collect', { query: ga_data })
-    puts res
+    self.class.post('/collect', { query: ga_data })
   end
 
 end
