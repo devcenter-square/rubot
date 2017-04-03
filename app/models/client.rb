@@ -33,7 +33,7 @@ class Client < ActiveRecord::Base
 
     client.on :close do |_data|
       puts 'Connection closing, exiting.'
-      # initiate_another_client
+      initiate_another_client
     end
 
     client.on :closed do |_data|
