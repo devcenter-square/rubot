@@ -51,7 +51,7 @@ gem 'psych'
 gem 'rake'
 gem 'test-unit'
 gem 'tzinfo-data'
-
+gem 'puma'
 gem 'newrelic_rpm'
 
 # Use ActiveModel has_secure_password
