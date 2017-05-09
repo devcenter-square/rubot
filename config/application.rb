@@ -31,8 +31,10 @@ module Rubot
     config.after_initialize do
       puts "ENV = development? #{Rails.env.development?}"
       
-      Rails.application.config.client_name = "rubolympics"
-      Rails.application.config.ndkey = "nd000" # seems this is only used for segment?
+      Rails.application.config.client_name = "rubot"
+
+      #todo: seems this is only used for segment? REMOVE
+      Rails.application.config.ndkey = "nd000"
 
     end
     
