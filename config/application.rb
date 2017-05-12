@@ -36,10 +36,6 @@ module Rubot
       #todo: seems this is only used for segment? REMOVE
       Rails.application.config.ndkey = "nd000"
 
-      Thread.new do
-        Client.new.initiate
-      end
-
     end
     
   end
