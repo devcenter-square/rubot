@@ -15,5 +15,3 @@ Rails.application.config.standard_responses =
     "That sounds interesting, but my bot brain has no idea what it means! Type `help` to see what I can respond to.",
     "Ahhh, to be fluent in English! Type `help` to see the limited English that I understand."
   ]
-
-Client.new.initiate
