@@ -1,20 +1,27 @@
-workers  5
-threads  1, 1 # relying on many workers for thread-unsafe apps
+workers 3
 
-environment ENV['RACK_ENV'] || 'production'
+# Min and Max threads per worker
+threads 1, 3 # relying on more workers
+
+# Default to production
+rails_env = ENV['RAILS_ENV'] || "production"
+environment rails_env
 daemonize   true
+
+app_dir = File.expand_path("../..", __FILE__)
 
 bind "unix:///var/run/puma/my_app.sock"
 pidfile "/var/run/puma/my_app.sock"
 
+on_worker_boot do
+  require "active_record"
+  ActiveRecord::Base.connection.disconnect! rescue ActiveRecord::ConnectionNotEstablished
+  ActiveRecord::Base.establish_connection(YAML.load_file("#{app_dir}/config/database.yml")[rails_env])
+end
 
-# app_dir = File.expand_path("../..", __FILE__)
+
+
 # shared_dir = "#{app_dir}/shared"
-#
-# # Default to production
-# rails_env = ENV['RAILS_ENV'] || "production"
-# environment rails_env
-#
 # # Set up socket location
 # bind "unix://#{shared_dir}/sockets/puma.sock"
 #
@@ -26,8 +33,3 @@ pidfile "/var/run/puma/my_app.sock"
 # state_path "#{shared_dir}/pids/puma.state"
 # activate_control_app
 #
-# on_worker_boot do
-#   require "active_record"
-#   ActiveRecord::Base.connection.disconnect! rescue ActiveRecord::ConnectionNotEstablished
-#   ActiveRecord::Base.establish_connection(YAML.load_file("#{app_dir}/config/database.yml")[rails_env])
-# end
