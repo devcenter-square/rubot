@@ -17,6 +17,17 @@
 
 </head>
 <body>
+
+  <!--render flash messages-->
+  <div class="flash_notice">
+    <% if notice %>
+      <p class="alert alert-success"><%= notice %></p>
+    <% end %>
+    <% if alert %>
+      <p class="alert alert-danger"><%= alert %></p>
+    <% end %>
+  </div>
+
   <div class="ui fixed inverted menu blue">
     <div class="ui container blue">
       <a href="/" class="header item">

@@ -19,8 +19,6 @@ gem 'jquery-rails'
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
-# bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0', group: :doc
 # wrapper for the Slack RTM API and its dependencies
 gem 'slack-ruby-client'
 gem 'eventmachine'
@@ -51,8 +49,6 @@ gem 'psych'
 gem 'rake'
 gem 'test-unit'
 gem 'tzinfo-data'
-gem 'puma'
-gem 'newrelic_rpm'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -66,6 +62,8 @@ gem 'newrelic_rpm'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+  # Pry to pry... go figure
+  gem 'pry-rails'
 end
 
 group :development do
@@ -74,8 +72,10 @@ group :development do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+end
 
-  # Pry to pry... go figure
-  gem 'pry-rails'
+group :production do
+  gem 'puma'
+  gem 'newrelic_rpm'
 end
 

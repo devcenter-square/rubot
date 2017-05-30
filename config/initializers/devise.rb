@@ -242,14 +242,19 @@ Devise.setup do |config|
   if Rails.env.development?
     config.omniauth :google_oauth2, 
       ENV['CLIENT_ID'], 
-      ENV['CLIENT_SECRET'], 
-      {:client_options => {:ssl => {:verify => false}}}
+      ENV['CLIENT_SECRET'],
+      {
+        :client_options => {:ssl => {:verify => false}},
+      }
   else
     config.omniauth :google_oauth2, 
       ENV['CLIENT_ID'], 
       ENV['CLIENT_SECRET'],
       #This is a temporary solution that needs to be fixed ASAP.
-      {:client_options => {:ssl => {:verify => false}}}
+      {
+        :client_options => {:ssl => {:verify => false}},
+        hd: 'devcenter.co'
+      }
   end
 
   # ==> Warden configuration
