@@ -1,14 +1,12 @@
 <!--render flash messages-->
-<div class="flash_notice">
-  <% if notice %>
-    <p class="alert alert-success"><%= notice %></p>
-  <% end %>
-  <% if alert %>
-    <div class="ui negative message">
-      <i class="close icon"></i>
-      <div class="header">
-        <%= alert %>
-      </div>
-    </div>
-  <% end %>
-</div>
+<% if notice %>
+  <div class="ui positive message">
+    <i class="close icon"></i>
+    <%= notice %>
+  </div>
+<% elsif alert %>
+  <div class="ui negative message">
+    <i class="close icon"></i>
+    <%= alert %>
+  </div>
+<% end %>

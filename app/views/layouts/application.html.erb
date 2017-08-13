@@ -17,53 +17,39 @@
 
 </head>
 <body>
-
-  <!--render flash messages-->
-  <div class="flash_notice">
-    <% if notice %>
-      <p class="alert alert-success"><%= notice %></p>
-    <% end %>
-    <% if alert %>
-      <p class="alert alert-danger"><%= alert %></p>
-    <% end %>
-  </div>
-
   <div class="ui fixed inverted menu blue">
     <div class="ui container blue">
       <a href="/" class="header item">
         <%= image_tag("dc_logo.png", :class => "logo") %>
           <%= "#{Rails.application.config.client_name}" %>
       </a>
-    <%= link_to 'Messages', messages_path, :class => "item" %>
-    <%= link_to 'Blasts', blasts_path, :class => "item" %>
-    <%= link_to 'Interactions', interactions_path, :class => "item" %>
-    <%= link_to 'User List', users_path, :class => "item" %>
-    <%= link_to 'Metrics', metrics_path, :class => "item" %>
-    <%= link_to 'Logs', logs_path, :class => "item" %>
+      <%= link_to 'Messages', messages_path, :class => "item" %>
+      <%= link_to 'Blasts', blasts_path, :class => "item" %>
+      <%= link_to 'Interactions', interactions_path, :class => "item" %>
+      <%= link_to 'User List', users_path, :class => "item" %>
+      <%= link_to 'Metrics', metrics_path, :class => "item" %>
+      <%= link_to 'Logs', logs_path, :class => "item" %>
 
       <div class="ui simple right dropdown item">
-      <% if current_admin %>
-        <%= current_admin.email %><i class="dropdown icon"></i>
+        <% if current_admin %>
+          <%= current_admin.email %><i class="dropdown icon"></i>
           <div class="menu">
             <%= link_to "Log Out", destroy_admin_session_path, :method => :delete, :class => "item" %>
-
-        </div>
-      <% else %>
+          </div>
+        <% else %>
           User <i class="dropdown icon"></i>
           <div class="menu">
             <%= link_to "Sign In", destroy_admin_session_path, :method => :delete, :class => "item" %>
-        </div>
-      <% end %>
-        
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
 
-  <!-- <div class="ui main text container"> -->
-    <p class="alert"><%= alert %></p>
-      <%= render 'layouts/user_widget' %>
-      <%= yield %>
-  <!-- </div> -->
+  <div class="ui main container">
+    <%= render 'layouts/flash_messages' %>
+    <%= yield %>
+  </div>
 
 
 </body>

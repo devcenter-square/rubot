@@ -165,27 +165,3 @@ i.circular.send.icon:hover, i.circular.comments.icon:hover, i.circular.users.ico
   color: #02b3e4;
 }
 
-.flash_notice {
-  z-index: 1000;
-  position: absolute;
-  min-width: 100%;
-  margin: 0 auto;
-  font-size: 1.1em;
-  color: white;
-}
-
-.flash_notice  .alert-danger {
-  background-color: darkred;
-}
-
-.flash_notice  .alert-success {
-  background-color: darkgreen;
-}
-
-/*margin-top: -25px;
-
-    margin-top: 13px;*/
-
-
-
-
