@@ -1,6 +1,5 @@
 <div class="ui grid">
-  <div class="two wide column"></div>
-  <div class="twelve wide column">
+  <div class="column">
     <p id="notice"><%= notice %></p>
 
     <div class="ui segment" id="spacer">
@@ -9,10 +8,10 @@
         <i class="help teal inline circular icon link" data-html="<div class='header'>Blasts</div><div class='content'> Blasts are sent to <strong>all</strong> members of the Slack team at the time of creation. <br><br>When you click 'create',<%=" #{Rails.application.config.client_name}" %> will message every user on your team!</div>">
         </i>
         
-        <button class="ui labeled teal icon small button right floated ">
+        <%= link_to new_blast_path, class: "ui labeled teal icon small button right floated " do %>
           <i class="write icon"></i>
-          <%= link_to 'New Blast', new_blast_path %>
-        </button>
+          <i>New Blast</i>
+        <% end %>
       </div>
       <div class="ui divider"></div>
 
@@ -43,7 +42,6 @@
       </table>
     </div>
   </div>
-  <div class="two wide column"></div>
 </div>
 
 <script type="text/javascript" charset="utf-8" >
