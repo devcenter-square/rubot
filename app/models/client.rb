@@ -46,6 +46,8 @@ class Client < ActiveRecord::Base
     reschedule_messages(client)
     update_user_list(client) #todo: maybe put this in a rake file
 
+    Rails.application.config.client = client
+
     client.start_async
   end
 
