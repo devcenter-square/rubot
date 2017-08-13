@@ -12,10 +12,13 @@ class Blast < ActiveRecord::Base
 
   def self.schedule_blasts(client)
     blast = Blast.last
+
+    # 5 seconds from now
     time = Time.now + 5
     api_members = client.web_client.users_list.members
     User.all.each do |user|
       if api_members.any? { |member| member.id == user.slack_id } && user.channel_id
+        # members get blasts in 2 seconds interval... is this necessary?
         time += 2
         s = Rufus::Scheduler.new(:max_work_threads => 1000)
         s.at time do

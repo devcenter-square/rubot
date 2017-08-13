@@ -3,7 +3,6 @@ class User < ActiveRecord::Base
   validates :slack_id, uniqueness: true
   
   def get_student_data(user)
-    puts user
     key = HTTParty.post(
       "https://registrar-window-api.udacity.com/authenticate",
       :body => 
