@@ -16,4 +16,4 @@ Rails.application.config.standard_responses =
     "Ahhh, to be fluent in English! Type `help` to see the limited English that I understand."
   ]
 
-Client.new.initiate
+Client.new.initiate unless Rails.env.development?
