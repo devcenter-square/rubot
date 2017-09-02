@@ -39,12 +39,12 @@ class User < ActiveRecord::Base
 
   def set_subscriptions(type, data, user)
     #Case of user with free and paid?
-    data["memberships"][type].each do |object|
-      if object["group_key"] == Rails.application.config.ndkey
-        user.enrolled = "As of #{Time.now.strftime('%D')}: #{type}"
-        user.save
-      end
-    end
+    # data["memberships"][type].each do |object|
+    #   if object["group_key"] == Rails.application.config.ndkey
+    #     user.enrolled = "As of #{Time.now.strftime('%D')}: #{type}"
+    #     user.save
+    #   end
+    # end
     if user.enrolled == nil
       user.enrolled = "As of #{Time.now.strftime('%D')}: NOT ENROLLED"
       user.save

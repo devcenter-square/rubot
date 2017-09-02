@@ -29,12 +29,7 @@ module Rubot
     config.ga_tracking_id = ENV['GA_TRACKING_ID']
 
     config.after_initialize do
-      puts "ENV = development? #{Rails.env.development?}"
-      
       Rails.application.config.client_name = "rubot"
-
-      #todo: seems this is only used for segment? REMOVE
-      Rails.application.config.ndkey = "nd000"
 
       Thread.new do
         Client.new.initiate unless Rails.env.development?
