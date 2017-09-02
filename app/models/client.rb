@@ -23,7 +23,7 @@ class Client < ActiveRecord::Base
     end
 
     client.on :team_join do |data|
-      send_scheduled_message(client: client, data: data)
+      send_scheduled_messages(client: client, data: data)
       add_new_user(client)
     end
 
