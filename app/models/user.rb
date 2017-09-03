@@ -1,6 +1,9 @@
 class User < ActiveRecord::Base
   require 'pp'
   validates :slack_id, uniqueness: true
+
+  # for pagination.
+  self.per_page = 10
   
   def get_student_data(user)
     key = HTTParty.post(

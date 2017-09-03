@@ -35,6 +35,10 @@
           <% end %>
         </tbody>
       </table>
+      <div class="digg_pagination">
+        <%= page_entries_info @users %>
+        <%= will_paginate @users %>
+      </div>
     </div>
   </div>
 </div>
