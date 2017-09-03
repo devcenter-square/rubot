@@ -15,9 +15,13 @@
 //= require turbolinks
 //= require_tree .
 
-$(document).ready(function() {
+var ready;
+ready = function() {
   $('.ui.accordion').accordion();
   $('.inline.icon').popup({inline: true});
   $('.icon').popup({inline: true});
   $(".ui.mini.rounded.image").popup({inline: true});
-});
+};
+
+$(document).ready(ready);
+$(document).on('page:load', ready);
