@@ -240,7 +240,7 @@ Devise.setup do |config|
 
   google_omniauth_options = {
     client_options: {:ssl => {:verify => false}},
-    # hd: 'devcenter.co'
+    hd: 'devcenter.co'
   }
 
   config.omniauth :google_oauth2, ENV['CLIENT_ID'], ENV['CLIENT_SECRET'], google_omniauth_options

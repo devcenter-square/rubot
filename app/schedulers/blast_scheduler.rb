@@ -21,7 +21,7 @@ class BlastScheduler
     me = User.find_by(user_name: "sunday", real_name: "Sunday Adefila")
     time += 2
     rs.at time do
-      send_blast(me.channel_id, "DONE!!! Sent blasts to all #{client_users.count} available members of DC-square")
+      send_blast(me.channel_id, "DONE!!! Another successful blast to #{client_users.count} available members of DC-square")
     end
 
   end
