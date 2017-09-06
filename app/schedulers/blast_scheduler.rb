@@ -8,11 +8,22 @@ class BlastScheduler
 
     me = User.find_by(user_name: "sunday", real_name: "Sunday Adefila")
 
+    time = Time.now + 5
+
+    rs = Rufus::Scheduler.new(max_work_threads: 1000)
+
     client_users.each do |user|
-      send_blast(me.channel_id, blast.text)
+      # DO NOT SPAM!!! send message at 2sec intervals. https://api.slack.com/docs/rate-limits
+      time += 2
+      rs.at time do
+        send_blast(me.channel_id, blast.text)
+      end
+    end
+    time += 2
+    rs.at time do
+      send_blast(me.channel_id, "DONE!!! Sent blasts to all #{client_users.count} available members of DC-square")
     end
 
-    send_blast(me.channel_id, "DONE!!! Sent blasts to all #{client_users.count} available members of DC-square")
   end
 
   def self.send_blast(channel_id, text)
