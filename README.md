@@ -100,7 +100,6 @@ RuBot is a Rails app built to be (somewhat) easily reproduced and customized. To
     ```
     Rails.application.config.client_name =
     Rails.application.config.ndkey =
-    Rails.application.config.standard_responses =
     ```
 
     Replace `rubot_profile_pic.png` in `/app/assets/images/` with your bot's logo. Be sure to leave the file name the same OR change the image tags throughout the project. 
