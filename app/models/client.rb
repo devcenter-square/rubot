@@ -158,12 +158,10 @@ class Client < ActiveRecord::Base
 
   def get_response_for_data(data)
     case data.text
-      when 'bot hi' then
-        "Hi <@#{data.user}>!"
-      when /^bot/ then
-        "Sorry <@#{data.user}>, what?"
+      when "`help`"
+        Interaction.all.map(&:user_input)
       else
-        Rails.application.config.standard_responses.sample
+        "Hi <@#{data.user}>!, sorry, I do not have response for this message..., for a list of possible interactions, type `help`"
     end
   end
 
