@@ -159,7 +159,7 @@ class Client < ActiveRecord::Base
   def get_response_for_data(data)
     case data.text
       when "help"
-        if INteraction.any?
+        if Interaction.any?
           Interaction.all.map(&:user_input).join('\n')
         else
           "Nothing configured at the moment, do check back later."
