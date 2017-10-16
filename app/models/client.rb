@@ -158,8 +158,12 @@ class Client < ActiveRecord::Base
 
   def get_response_for_data(data)
     case data.text
-      when "`help`"
-        Interaction.all.map(&:user_input)
+      when "help"
+        if INteraction.any?
+          Interaction.all.map(&:user_input).join('\n')
+        else
+          "Nothing configured at the moment, do check back later."
+        end
       else
         "Hi <@#{data.user}>!, sorry, I do not have response for this message..., for a list of possible interactions, type `help`"
     end
