@@ -157,16 +157,34 @@ class Client < ActiveRecord::Base
   end
 
   def get_response_for_data(data)
+    feedback_resp = "To give us a feedback, use `/report`... eg: `/report You are awesome!!!`"
+
     case data.text
-      when "help"
+      when "help", "Help"
         if Interaction.any?
-          Interaction.all.map(&:user_input).join('\n')
+          interactions = Interaction.all.map{ |i| "`#{i.user_input}`" }.join("\n")
+          interactions << feedback_resp
+          interactions.join("\n")
         else
           "Nothing configured at the moment, do check back later."
         end
+      when /^//report/
+        post_feedback(data.text)
+        "Thank you for the feedback, it has been logged, and will be addressed"
       else
-        "Hi <@#{data.user}>!, sorry, I do not have response for this message..., for a list of possible interactions, type `help`"
+        <<RESPONSE
+          Hi <@#{data.user}>!, sorry, I do not have response for this message...,
+          For a list of possible interactions, type `help`
+          #{feedback_resp}
+        RESPONSE
     end
+  end
+
+  def post_feedback(feedback)
+    client = Rails.application.config.client
+    channel = User.find_by(email: ENV['REPORT_FEEDBACKS_TO_EMAIL']).channel_id
+
+    send_message(channel, feedback, client)
   end
 
   #Grabs the channel data from slack's api
