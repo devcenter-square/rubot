@@ -18,10 +18,10 @@ class BlastScheduler
     end
 
     # TODO: Just for debugging, remove this soon
-    me = User.find_by(user_name: "sunday", real_name: "Sunday Adefila")
+    feedback_channel = User.find_by(email: ENV['REPORT_FEEDBACKS_TO_EMAIL']).channel_id
     time += 2
     rs.at time do
-      send_blast(me.channel_id, "DONE!!! Another successful blast to #{client_users.count} available members of DC-square")
+      send_blast(feedback_channel, "DONE!!! Another successful blast to #{client_users.count} available members of DC-square")
     end
 
   end

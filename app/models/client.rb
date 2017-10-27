@@ -169,7 +169,7 @@ class Client < ActiveRecord::Base
           "Nothing configured at the moment, do check back later."
         end
       when /^//report/
-        post_feedback(data.text)
+        post_feedback(data)
         "Thank you for the feedback, it has been logged, and will be addressed"
       else
         <<RESPONSE
@@ -180,11 +180,12 @@ class Client < ActiveRecord::Base
     end
   end
 
-  def post_feedback(feedback)
+  def post_feedback(data)
     client = Rails.application.config.client
     channel = User.find_by(email: ENV['REPORT_FEEDBACKS_TO_EMAIL']).channel_id
+    text = ">#{data.text}\nFrom: <@#{data.user}>"
 
-    send_message(channel, feedback, client)
+    send_message(channel, text, client)
   end
 
   #Grabs the channel data from slack's api
