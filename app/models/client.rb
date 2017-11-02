@@ -157,22 +157,22 @@ class Client < ActiveRecord::Base
   end
 
   def get_response_for_data(data)
-    feedback_resp = "To give us a feedback, use `/report`... eg: `/report You are awesome!!!`"
+    feedback_resp = "To give us a feedback, use `feedback:`... eg: `feedback: You are awesome!!!`"
 
     case data.text
       when "help", "Help"
         if Interaction.any?
-          interactions = Interaction.all.map{ |i| "`#{i.user_input}`" }.join("\n")
+          interactions = Interaction.all.map{ |i| "`#{i.user_input}`" }
           interactions << feedback_resp
           interactions.join("\n")
         else
           "Nothing configured at the moment, do check back later."
         end
-      when /^\/report/
+      when /^feedback:/
         post_feedback(data)
         "Thank you for the feedback, it has been logged, and will be addressed"
       else
-        <<-RESPONSE
+        <<~RESPONSE
           Hi <@#{data.user}>!, sorry, I do not have response for this message...,
           For a list of possible interactions, type `help`
           #{feedback_resp}
@@ -183,7 +183,7 @@ class Client < ActiveRecord::Base
   def post_feedback(data)
     client = Rails.application.config.client
     channel = User.find_by(email: ENV['REPORT_FEEDBACKS_TO_EMAIL']).channel_id
-    text = ">#{data.text}\nFrom: <@#{data.user}>"
+    text = ">#{data.text.gsub('feedback:', '').strip}\nFrom: <@#{data.user}>"
 
     send_message(channel, text, client)
   end
