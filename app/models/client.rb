@@ -172,7 +172,7 @@ class Client < ActiveRecord::Base
         post_feedback(data)
         "Thank you for the feedback, it has been logged, and will be addressed"
       else
-        <<RESPONSE
+        <<-RESPONSE
           Hi <@#{data.user}>!, sorry, I do not have response for this message...,
           For a list of possible interactions, type `help`
           #{feedback_resp}
