@@ -168,7 +168,7 @@ class Client < ActiveRecord::Base
         else
           "Nothing configured at the moment, do check back later."
         end
-      when /^//report/
+      when /^\/report/
         post_feedback(data)
         "Thank you for the feedback, it has been logged, and will be addressed"
       else
