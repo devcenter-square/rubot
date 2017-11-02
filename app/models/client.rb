@@ -182,7 +182,7 @@ class Client < ActiveRecord::Base
 
   def post_feedback(data)
     client = Rails.application.config.client
-    channel = User.find_by(email: ENV['REPORT_FEEDBACKS_TO_EMAIL']).channel_id
+    channel = User.find_by(user_name: ENV['FEEDBACKS_TO']).channel_id
     text = ">#{data.text.gsub('feedback:', '').strip}\nFrom: <@#{data.user}>"
 
     send_message(channel, text, client)
