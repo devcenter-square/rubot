@@ -24,7 +24,7 @@ class Client < ActiveRecord::Base
 
     client.on :team_join do |data|
       send_scheduled_messages(client: client, data: data)
-      add_new_user(client)
+      add_new_user(data)
     end
 
     client.on :user_change do |data|
@@ -60,7 +60,7 @@ class Client < ActiveRecord::Base
   end
 
   private
-  def add_new_user(client)
+  def add_new_user(data)
     get_users
     unless @users.any? { |person| person.slack_id == data.user.id }
       @user = User.new(
